@@ -39,6 +39,32 @@ impl Parser {
 
                         self.set(cmd_words[1], cmd_words[2]);
                       }
+
+            "EXISTS"  => {
+                            if cmd_words.len() != 2 {
+                                println!("Invalid number of arguments. Required: 1, Found: {}", cmd_words.len() - 1);
+                                return Err("Incorrect number of arguments");
+                            }
+
+                            if self.exists(cmd_words[1]) {
+                                println!("Key {} exists.", cmd_words[1]);
+                            }
+                            else {
+                                println!("Key does not exist.");
+                            }
+                         } 
+    
+            "DEL"     => {
+                            if cmd_words.len() != 2 {
+                                println!("Invalid number of arguments. Required: 1, Found: {}", cmd_words.len() - 1);
+                                return Err("Incorrect number of arguments");
+                            }
+
+                            match self.del(cmd_words[1]) {
+                                Ok(val) => println!("Deleted key with value: {}", val.as_str()),
+                                Err(err)  => return Err(err)
+                            }
+                         } 
     
             "PING" => println!("PONG"),
     
@@ -53,11 +79,21 @@ impl Parser {
 
     fn get(&self, key: &str) -> Option<&str> {
         println!("GET");
-        return self.cache.get(key);
+        self.cache.get(key)
     }
 
     fn set(&mut self, key: &str, val: &str) {
         println!("SET");
         self.cache.insert(key.to_string(), val.to_string());
+    }
+
+    fn exists(&self, key: &str) -> bool {
+        println!("EXISTS");
+        self.cache.exists(key)
+    }
+
+    fn del(&mut self, key: &str) -> Result<String, &str> {
+        println!("DEL");
+        self.cache.del(key)
     }
 }
