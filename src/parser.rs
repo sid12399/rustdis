@@ -9,21 +9,21 @@ impl Parser {
         Parser { cache: KeyValueStore::new() }
     }
 
-    pub fn process_command(&mut self, raw_cmd: &str) -> Result<&str, &str> {
+    pub fn process_command(&mut self, raw_cmd: &str) -> Result<String, String> {
         // Split the command into a list of tokens
         let cmd_words: Vec<&str> = raw_cmd.trim().split(' ').collect();
     
         if cmd_words.len() == 0 {
-            println!("Error: Empty Command");
-            return Err("Empty Command");
+            return Err("Empty Command".to_string());
         }
         
         // Match the first word with available commands
         match cmd_words[0] {
             "GET"       =>  {
                                 if cmd_words.len() != 2 {
-                                    println!("Invalid number of arguments. Required: 1, Found: {}", cmd_words.len() - 1);
-                                    return Err("Incorrect number of arguments");
+                                    return Err(
+                                            format!("Invalid number of arguments. Required: 1, Found: {}", cmd_words.len() - 1)
+                                        );
                                 }
                             
                                 match self.get(cmd_words[1]) {
@@ -34,17 +34,19 @@ impl Parser {
             
             "SET"       =>  {
                                 if cmd_words.len() != 3 {
-                                    println!("Invalid number of arguments. Required: 2, Found: {}", cmd_words.len() - 1);
-                                    return Err("Incorrect number of arguments");
+                                    return Err(
+                                            format!("Invalid number of arguments. Required: 2, Found: {}", cmd_words.len() - 1)
+                                        );
                                 }
 
                                 self.set(cmd_words[1], cmd_words[2]);
-                            }
+                            },
 
             "EXISTS"    =>  {
                                 if cmd_words.len() != 2 {
-                                    println!("Invalid number of arguments. Required: 1, Found: {}", cmd_words.len() - 1);
-                                    return Err("Incorrect number of arguments");
+                                    return Err(
+                                            format!("Invalid number of arguments. Required: 1, Found: {}", cmd_words.len() - 1)
+                                        );
                                 }
 
                                 if self.exists(cmd_words[1]) {
@@ -53,31 +55,33 @@ impl Parser {
                                 else {
                                     println!("Key does not exist.");
                                 }
-                            } 
+                            }, 
     
             "DEL"       =>  {
                                 if cmd_words.len() != 2 {
-                                    println!("Invalid number of arguments. Required: 1, Found: {}", cmd_words.len() - 1);
-                                    return Err("Incorrect number of arguments");
+                                    return Err(
+                                            format!("Invalid number of arguments. Required: 1, Found: {}", cmd_words.len() - 1)
+                                        );
                                 }
 
                                 match self.del(cmd_words[1]) {
                                     Ok(val) => println!("Deleted key with value: {}", val.as_str()),
                                     Err(err)  => return Err(err)
                                 }
-                            } 
+                            }, 
     
             "PING"      =>  {
-                                println!("PONG")
-                            }
+                                println!("PONG");
+                            },
     
             _           =>  {
-                                println!("Error: {} is an invalid comand", cmd_words[0]);
-                                return Err("Invalid Command");
+                                return Err(
+                                        format!("Error: {} is an invalid comand", cmd_words[0])
+                                    );
                             }
         }
     
-        return Ok("Success");
+        return Ok("Success".to_string());
     }
 
     fn get(&self, key: &str) -> Option<&str> {
@@ -95,7 +99,7 @@ impl Parser {
         self.cache.exists(key)
     }
 
-    fn del(&mut self, key: &str) -> Result<String, &str> {
+    fn del(&mut self, key: &str) -> Result<String, String> {
         println!("DEL");
         self.cache.del(key)
     }

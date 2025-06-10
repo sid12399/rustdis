@@ -25,10 +25,10 @@ impl KeyValueStore {
         }
     }
 
-    pub fn del(&mut self, key: &str) -> Result<String, &str> {
+    pub fn del(&mut self, key: &str) -> Result<String, String> {
        match self.kv.remove(key) {
         Some(key ) => return Ok(key),
-        None               => return Err("Key not found.")
+        None               => return Err("Key not found.".to_string())
        }
     } 
 }
