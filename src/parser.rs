@@ -11,6 +11,7 @@ impl Parser {
 
     pub fn process_command(&mut self, raw_cmd: &str) -> Result<String, String> {
         // Split the command into a list of tokens
+        let success_msg: String;
         let cmd_words: Vec<&str> = raw_cmd.trim().split(' ').collect();
     
         if cmd_words.len() == 0 {
@@ -27,8 +28,8 @@ impl Parser {
                                 }
                             
                                 match self.get(cmd_words[1]) {
-                                    Some(val) => println!("Value: {}", val),
-                                    None            => println!("Key not found")
+                                    Some(val) => success_msg = format!("Value: {}", val),
+                                    None            => success_msg = format!("Key not found")
                                 }
                             },
             
@@ -40,6 +41,7 @@ impl Parser {
                                 }
 
                                 self.set(cmd_words[1], cmd_words[2]);
+                                success_msg = format!("Successfully set pair.");
                             },
 
             "EXISTS"    =>  {
@@ -50,10 +52,10 @@ impl Parser {
                                 }
 
                                 if self.exists(cmd_words[1]) {
-                                    println!("Key {} exists.", cmd_words[1]);
+                                    success_msg = format!("Key {} exists.", cmd_words[1]);
                                 }
                                 else {
-                                    println!("Key does not exist.");
+                                    success_msg = format!("Key does not exist.");
                                 }
                             }, 
     
@@ -65,13 +67,13 @@ impl Parser {
                                 }
 
                                 match self.del(cmd_words[1]) {
-                                    Ok(val) => println!("Deleted key with value: {}", val.as_str()),
-                                    Err(err)  => return Err(err)
+                                    Ok(val)     => success_msg = format!("Deleted key with value: {}", val.as_str()),
+                                    Err(err)    => return Err(err)
                                 }
                             }, 
     
             "PING"      =>  {
-                                println!("PONG");
+                                success_msg = format!("PONG");
                             },
     
             _           =>  {
@@ -81,7 +83,7 @@ impl Parser {
                             }
         }
     
-        return Ok("Success".to_string());
+        return Ok(success_msg);
     }
 
     fn get(&self, key: &str) -> Option<&str> {
